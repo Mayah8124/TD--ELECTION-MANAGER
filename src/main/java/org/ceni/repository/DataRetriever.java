@@ -2,6 +2,8 @@ package org.ceni.repository;
 
 import org.ceni.*;
 import org.ceni.db.DBConnection;
+import org.ceni.model.Candidate;
+import org.ceni.model.CandidateVoteCount;
 import org.ceni.model.VoteType;
 import org.ceni.model.VoteTypeCount;
 
@@ -56,5 +58,48 @@ public class DataRetriever {
                 throw new RuntimeException(e);
         }
         return voteTypeCounts;
+    }
+
+    public List<CandidateVoteCount> countValidVotesByCandidate() {
+        String sql = """
+                    select
+                        c.name,
+                        (
+                            select count(v.id)
+                            from vote v
+                            where v.candidate_id = c.id
+                              and v.vote_type = 'VALID'
+                        ) as total_valid_votes
+                    from candidate c
+                    order by c.id;
+                """;
+
+        List<CandidateVoteCount> candidateVoteCounts = new ArrayList<>();
+
+        try (
+                Connection conn = dbConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()
+                ) {
+            while (rs.next()) {
+                String name = rs.getString("name");
+
+                Candidate candidate = new Candidate();
+                candidate.setName(name);
+
+                long totalValid = rs.getLong("total_valid_votes");
+
+                VoteTypeCount validVoteCount = new VoteTypeCount();
+                validVoteCount.setVoteType(VoteType.VALID);
+                validVoteCount.setCount(totalValid);
+
+                CandidateVoteCount candidateVoteCount = new CandidateVoteCount( candidate, validVoteCount);
+
+                candidateVoteCounts.add(candidateVoteCount);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return candidateVoteCounts;
     }
 }
