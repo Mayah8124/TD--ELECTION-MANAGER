@@ -23,6 +23,7 @@ public class DataRetriever {
             if (rs.next()) {
                 return rs.getLong("total_votes");
             }
+            dbConnection.closeConnection(conn);
             return 0;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -51,6 +52,7 @@ public class DataRetriever {
 
                 voteTypeCounts.add(new VoteTypeCount(voteType, count));
             }
+            dbConnection.closeConnection(conn);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
         }
@@ -94,6 +96,7 @@ public class DataRetriever {
 
                 candidateVoteCounts.add(candidateVoteCount);
             }
+            dbConnection.closeConnection(conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -119,6 +122,7 @@ public class DataRetriever {
                 voteSummary.setNullCount(rs.getInt("null_count"));
                 return voteSummary;
             }
+            dbConnection.closeConnection(conn);
             throw new RuntimeException("Unable to compute vote summary");
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -139,6 +143,7 @@ public class DataRetriever {
             if (rs.next()) {
                 return rs.getDouble("participation_rate");
             }
+            dbConnection.closeConnection(conn);
             throw new RuntimeException("Unable to compute turnout rate");
         } catch (SQLException e) {
             throw new RuntimeException("Database error while computing turnout rate", e);
@@ -168,6 +173,7 @@ public class DataRetriever {
                 electionResult.setValidVoteCount(rs.getInt("valid_vote_count"));
                 return electionResult;
             }
+            dbConnection.closeConnection(conn);
             throw new RuntimeException("Unable to find winner");
         } catch (SQLException e) {
             throw new RuntimeException("Database error while computing winner", e);
