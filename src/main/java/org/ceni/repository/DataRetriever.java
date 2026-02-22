@@ -2,10 +2,7 @@ package org.ceni.repository;
 
 import org.ceni.*;
 import org.ceni.db.DBConnection;
-import org.ceni.model.Candidate;
-import org.ceni.model.CandidateVoteCount;
-import org.ceni.model.VoteType;
-import org.ceni.model.VoteTypeCount;
+import org.ceni.model.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -103,5 +100,29 @@ public class DataRetriever {
         return candidateVoteCounts;
     }
 
+    public VoteSummary computeVoteSummary () {
+        String sql = """
+                    select count((case when v.vote_type = 'VALID' then 1 end)) as valid_count,
+                            count ((case when v.vote_type = 'BLANK' then 1 end)) as blank_count,
+                            count((case when v.vote_type = 'NULL' then 1 end)) as null_count
+                    from vote v
+                """;
+        try (
+                Connection conn = dbConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()
+                ) {
+            if (rs.next()) {
+                VoteSummary voteSummary = new VoteSummary();
+                voteSummary.setValidCount(rs.getInt("valid_count"));
+                voteSummary.setBlankCount(rs.getInt("blank_count"));
+                voteSummary.setNullCount(rs.getInt("null_count"));
+                return voteSummary;
+            }
+            throw new RuntimeException("Unable to compute vote summary");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
+    }
 }
