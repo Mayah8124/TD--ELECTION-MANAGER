@@ -2,6 +2,7 @@ package org.ceni;
 
 
 import org.ceni.model.CandidateVoteCount;
+import org.ceni.model.ElectionResult;
 import org.ceni.model.VoteSummary;
 import org.ceni.model.VoteTypeCount;
 import org.ceni.repository.DataRetriever;
@@ -44,6 +45,9 @@ public class Main {
 //        System.out.println(voteSummary);
 
         Double computeTurnoutRate = dataRetriever.computeTurnoutRate();
-        System.out.println("Taux de participation = " + computeTurnoutRate + "%");
+//        System.out.println("Taux de participation = " + computeTurnoutRate + "%");
+
+        ElectionResult electionResult = dataRetriever.findWinner();
+        System.out.println( electionResult);
     }
 }

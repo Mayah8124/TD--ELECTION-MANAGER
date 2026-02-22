@@ -144,4 +144,33 @@ public class DataRetriever {
             throw new RuntimeException("Database error while computing turnout rate", e);
         }
     }
+
+    public ElectionResult findWinner() {
+        String sql = """
+                select c.name as candidate_name,
+                       count(v.id) as valid_vote_count
+                from candidate c
+                join vote v on v.candidate_id = c.id
+                where v.vote_type = 'VALID'
+                group by c.id, c.name
+                order by valid_vote_count desc
+                limit 1
+                """;
+
+        try (
+                Connection conn = dbConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()
+                ) {
+            if (rs.next()) {
+                ElectionResult electionResult = new ElectionResult();
+                electionResult.setCandidateName(rs.getString("candidate_name"));
+                electionResult.setValidVoteCount(rs.getInt("valid_vote_count"));
+                return electionResult;
+            }
+            throw new RuntimeException("Unable to find winner");
+        } catch (SQLException e) {
+            throw new RuntimeException("Database error while computing winner", e);
+        }
+    }
 }
