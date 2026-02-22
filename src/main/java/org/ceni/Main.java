@@ -41,6 +41,9 @@ public class Main {
 //        System.out.println(sb);
 
         VoteSummary voteSummary = dataRetriever.computeVoteSummary();
-        System.out.println(voteSummary);
+//        System.out.println(voteSummary);
+
+        Double computeTurnoutRate = dataRetriever.computeTurnoutRate();
+        System.out.println("Taux de participation = " + computeTurnoutRate + "%");
     }
 }
