@@ -7,7 +7,6 @@ import org.ceni.model.VoteSummary;
 import org.ceni.model.VoteTypeCount;
 import org.ceni.repository.DataRetriever;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
